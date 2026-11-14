@@ -36,6 +36,10 @@ Builds named lighting setups in Blender **relative to the subject and the active
 
 Non-destructive by design: new lights go in an `LT_<preset>` collection, existing lights are hidden (not deleted), the previous `LT_` collection is hidden, and the original world color and exposure are saved. `lt_restore()` brings the original scene back. Delete `LT_` collections only if the user asks.
 
+## Lighting grammar (read before proposing options)
+
+When the user describes a mood or a product ("luxury perfume ad", "horror", "clean cosmetics"), read `references/lighting-grammar.md` first. It turns those words into lighting rules, each with a source and an evidence level (experiment / practitioner convention / graphics metric / our interpretation). Build the 3 options from its genre recipes, make the options differ along one clear axis (dark-field vs bright-field, low-key vs high-key, warm vs cool), and run its render checks before showing anything. When you explain a choice, say whether it rests on an experiment or on convention.
+
 ## Asking the user
 
 Lighting is taste. Don't pick for the user. Offer choices and let them decide. Skip the questions only when they already named a preset ("Rembrandt", "03", "골든아워") or told you to just pick.

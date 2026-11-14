@@ -149,7 +149,7 @@ export class Studio {
   fromView(v) { return v.clone().applyQuaternion(this.camera.quaternion).normalize(); }
 
   // ---------- presets ----------
-  applyPreset(id) {
+  applyPreset(id, { silent = false } = {}) {
     const p = PRESETS[id];
     if (!p) return;
     this.currentPreset = id;
@@ -158,7 +158,7 @@ export class Studio {
     for (const spec of p.lights) this.addLight(spec, basis);
     this.setWorld(p.world || {});
     this._extras(p.extras || {});
-    this.emit('lights');
+    if (!silent) this.emit('lights');
   }
 
   clearLights() {
@@ -250,6 +250,7 @@ export class Studio {
   }
 
   setWorld(w) {
+    this.world = { ...w };
     const strength = w.strength ?? 0.05;
     const rgb = w.kelvin ? kelvinToRGB(w.kelvin) : (w.color || [1, 1, 1]);
     const c = new THREE.Color().setRGB(rgb[0], rgb[1], rgb[2], THREE.SRGBColorSpace);
@@ -321,7 +322,84 @@ export class Studio {
     e.beamMesh.material.uniforms.color.value.copy(e.light.color);
   }
 
-  // ---------- light editing (used by the light ball and the list) ----------
+  // ---------- state: preview a preset on hover, then go back ----------
+  serialize() {
+    return {
+      preset: this.currentPreset,
+      world: { ...(this.world || {}) },
+      lights: this.lights.map((e) => ({ spec: { ...e.spec }, dir: e.dir.toArray(), dist: e.dist, ratio: e.ratio, softness: e.softness, kelvin: e.kelvin, color: e.color, on: e.on })),
+    };
+  }
+
+  restore(st, { silent = false } = {}) {
+    this.currentPreset = st.preset;
+    this.clearLights();
+    for (const l of st.lights) {
+      const e = this.addLight(l.spec);
+      e.dir.fromArray(l.dir); Object.assign(e, { dist: l.dist, ratio: l.ratio, softness: l.softness, kelvin: l.kelvin, color: l.color, on: l.on });
+      this.updateLight(e);
+    }
+    this.setWorld(st.world || {});
+    this._extras(PRESETS[st.preset]?.extras || {});
+    if (!silent) this.emit('lights');
+  }
+
+  preview(id) {
+    if (!this.previewBase) this.previewBase = this.serialize();
+    this.applyPreset(id);
+  }
+
+  endPreview() {
+    if (!this.previewBase) return;
+    const base = this.previewBase;
+    this.previewBase = null;
+    this.restore(base);
+  }
+
+  commit(id) { this.previewBase = null; if (this.currentPreset !== id) this.applyPreset(id); else this.emit('lights'); }
+
+  // light direction as camera-relative azimuth / elevation (degrees), for the diagrams
+  azElOf(dir, basis = this.camBasis()) {
+    const el = THREE.MathUtils.radToDeg(Math.asin(THREE.MathUtils.clamp(dir.y, -1, 1)));
+    const h = new THREE.Vector3(dir.x, 0, dir.z);
+    if (h.lengthSq() < 1e-9) return { az: 0, el };
+    h.normalize();
+    const az = THREE.MathUtils.radToDeg(Math.atan2(h.dot(basis.right), h.dot(basis.f)));
+    return { az, el };
+  }
+
+  setLightAzElDist(e, az, el, dist) {
+    e.dir.copy(this.dirFromAzEl(az, el));
+    if (dist != null) e.dist = dist;
+    this.updateLight(e); this._syncProp(e); this.emit('edit');
+  }
+
+  // Render each preset on the current model into a small image, without disturbing the view.
+  async thumbnails(ids, w = 168, onEach) {
+    const r = this.renderer, canvas = this.canvas;
+    const pr = r.getPixelRatio();
+    const h = Math.round(w / this.camera.aspect);
+    const out = document.createElement('canvas');
+    out.width = Math.round(w * pr); out.height = Math.round(h * pr);
+    const g = out.getContext('2d');
+    for (const id of ids) {
+      if (this.disposedThumbs) return;
+      const base = this.serialize();
+      this.applyPreset(id, { silent: true });
+      r.setScissorTest(true);
+      r.setViewport(0, 0, w, h); r.setScissor(0, 0, w, h);
+      r.render(this.scene, this.camera);
+      g.clearRect(0, 0, out.width, out.height);
+      g.drawImage(canvas, 0, canvas.height - out.height, out.width, out.height, 0, 0, out.width, out.height);
+      r.setScissorTest(false);
+      const full = new THREE.Vector2(); r.getSize(full); r.setViewport(0, 0, full.x, full.y);
+      this.restore(base, { silent: true });
+      onEach?.(id, out.toDataURL('image/jpeg', 0.85));
+      await new Promise((res) => setTimeout(res, 0));
+    }
+  }
+
+  // ---------- light editing (used by the diagrams and the list) ----------
   setLightDir(e, dir) { e.dir.copy(dir).normalize(); this.updateLight(e); this._syncProp(e); this.emit('edit'); }
   setLightParam(e, key, value) { e[key] = value; this.updateLight(e); this._syncProp(e); this.emit('edit'); }
 
