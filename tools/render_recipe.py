@@ -20,6 +20,12 @@ extra = json.loads(sys.argv[6]) if len(sys.argv) > 6 else {}
 sys.path.insert(0, os.path.join(ROOT, "catalog"))
 from apply import apply_options, defaults
 recipes = {r["id"]: r for r in json.load(open(os.path.join(ROOT, "catalog/recipes.json")))["recipes"]}
+finishing = {g["id"]: g for g in json.load(open(os.path.join(ROOT, "catalog/finishing.json")))["options"]}
+fin_chosen = {k: extra.pop(k) for k in list(extra) if k in finishing}
+fin = {}
+for gid, g in finishing.items():
+    cid = fin_chosen.get(gid, g["default"])
+    fin[gid] = next(c for c in g["choices"] if c["id"] == cid)
 if "rig" in extra:
     recipe = extra
 else:
@@ -37,12 +43,22 @@ lo = Vector([min(p[i] for p in pts) for i in range(3)])
 hi = Vector([max(p[i] for p in pts) for i in range(3)])
 center, size = (lo + hi) / 2, (hi - lo).length
 
-# camera: front, slightly above, framed to the subject
-cd = bpy.data.cameras.new("Cam"); cd.lens = 85
+# camera from the finishing "angle" choice (lights are camera-relative, so the look follows)
+camspec = fin["angle"]["camera"]
+cd = bpy.data.cameras.new("Cam"); cd.lens = camspec["lens"]
 cam = bpy.data.objects.new("Cam", cd)
-dist = size * 2.9
-cam.location = center + Vector((0, -dist, size * 0.18))
+dist = size * 2.9 * camspec["lens"] / 85
+a_, e_ = math.radians(camspec["az"]), math.radians(camspec["el"])
+cam.location = center + Vector((-math.sin(a_) * math.cos(e_), -math.cos(a_) * math.cos(e_), math.sin(e_))) * dist
 cam.rotation_euler = (center - cam.location).to_track_quat('-Z', 'Y').to_euler()
+if fin["dof"]["dof"]:
+    # f-number in "real product photo" terms (f/8-f/16), rescaled so a ~15 cm product looks right in scene units
+    cd.dof.use_dof = True
+    # focus on the side facing the camera (the label/front face must stay sharp)
+    view = (center - cam.location).normalized()
+    half_depth = max(abs(view.x) * (hi.x - lo.x), abs(view.y) * (hi.y - lo.y), abs(view.z) * (hi.z - lo.z)) / 2
+    cd.dof.focus_distance = (cam.location - center).length - half_depth
+    cd.dof.aperture_fstop = fin["dof"]["dof"]["fstop_rel"] * 0.15 / size
 bpy.context.scene.collection.objects.link(cam)
 bpy.context.scene.camera = cam
 
@@ -148,4 +164,10 @@ sc.render.resolution_x = sc.render.resolution_y = RES
 sc.view_settings.view_transform = 'AgX'
 sc.render.filepath = out
 bpy.ops.render.render(write_still=True)
+post = fin["grade"]["post"]
+if post:
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    from finish_post import apply_post
+    from PIL import Image
+    apply_post(Image.open(out), post).save(out)
 print("rendered", out)

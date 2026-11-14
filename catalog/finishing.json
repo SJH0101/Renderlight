@@ -1,0 +1,163 @@
+{
+  "_about": "Finishing options that apply to every recipe. Lights are camera-relative, so changing the angle keeps the lighting look. camera.az: 0 = front, + = toward the subject's left side as seen by the viewer; camera.el: degrees above the subject center.",
+  "options": [
+    {
+      "id": "angle",
+      "ask": {
+        "ko": "앵글은?",
+        "en": "Camera angle?"
+      },
+      "default": "front",
+      "choices": [
+        {
+          "id": "front",
+          "label": {
+            "ko": "정면",
+            "en": "Front"
+          },
+          "note": "정직하고 깔끔한 제품컷",
+          "camera": {
+            "az": 0,
+            "el": 4,
+            "lens": 85
+          }
+        },
+        {
+          "id": "hero",
+          "label": {
+            "ko": "히어로 (비스듬히 위)",
+            "en": "Hero 3/4"
+          },
+          "note": "입체감이 가장 잘 보이는 광고 앵글",
+          "camera": {
+            "az": 32,
+            "el": 16,
+            "lens": 85
+          }
+        },
+        {
+          "id": "low",
+          "label": {
+            "ko": "로우 (올려보기)",
+            "en": "Low"
+          },
+          "note": "제품이 크고 당당해 보인다",
+          "camera": {
+            "az": 18,
+            "el": -3,
+            "lens": 65
+          }
+        }
+      ]
+    },
+    {
+      "id": "dof",
+      "ask": {
+        "ko": "배경 흐림(피사계 심도)은?",
+        "en": "Depth of field?"
+      },
+      "default": "off",
+      "choices": [
+        {
+          "id": "off",
+          "label": {
+            "ko": "없음",
+            "en": "Off"
+          },
+          "note": "전부 선명",
+          "dof": null
+        },
+        {
+          "id": "soft",
+          "label": {
+            "ko": "약하게",
+            "en": "Soft"
+          },
+          "note": "뒤쪽만 살짝 흐려진다",
+          "dof": {
+            "fstop_rel": 16
+          }
+        },
+        {
+          "id": "strong",
+          "label": {
+            "ko": "강하게",
+            "en": "Strong"
+          },
+          "note": "앞면은 선명하고 뒤쪽이 확 흐려진다",
+          "dof": {
+            "fstop_rel": 8
+          }
+        }
+      ],
+      "note": "배경이 비어 있는 레시피(다크필드 등)에서는 흐려질 대상이 없어 효과가 작다. 바닥·배경이 보이는 레시피에서 효과가 크다."
+    },
+    {
+      "id": "grade",
+      "ask": {
+        "ko": "색보정은?",
+        "en": "Color grade?"
+      },
+      "default": "none",
+      "choices": [
+        {
+          "id": "none",
+          "label": {
+            "ko": "없음",
+            "en": "None"
+          },
+          "note": "렌더 그대로",
+          "post": {}
+        },
+        {
+          "id": "warm_film",
+          "label": {
+            "ko": "따뜻한 필름",
+            "en": "Warm film"
+          },
+          "note": "따뜻한 하이라이트, 살짝 들뜬 검정, 은은한 빛 번짐",
+          "post": {
+            "contrast": 1.06,
+            "lift": [
+              0.035,
+              0.025,
+              0.015
+            ],
+            "gain": [
+              1.04,
+              1.0,
+              0.94
+            ],
+            "bloom": 0.25,
+            "vignette": 0.28,
+            "grain": 0.018
+          }
+        },
+        {
+          "id": "cool_crisp",
+          "label": {
+            "ko": "차갑고 선명",
+            "en": "Cool crisp"
+          },
+          "note": "차가운 그림자, 높은 대비, 선명한 디테일",
+          "post": {
+            "contrast": 1.14,
+            "lift": [
+              0.0,
+              0.006,
+              0.02
+            ],
+            "gain": [
+              0.97,
+              1.0,
+              1.04
+            ],
+            "sharpen": 0.6,
+            "bloom": 0.1,
+            "vignette": 0.2
+          }
+        }
+      ]
+    }
+  ]
+}

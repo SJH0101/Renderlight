@@ -41,11 +41,12 @@ def rounded_box(name, size, bevel, segs=6, loc=(0, 0, 0), material=None):
     o.name = name
     o.scale = size
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-    m = o.modifiers.new("bevel", 'BEVEL')
-    m.width = bevel
-    m.segments = segs
-    m.limit_method = 'NONE'
-    bpy.ops.object.modifier_apply(modifier="bevel")
+    if bevel > 0:
+        m = o.modifiers.new("bevel", 'BEVEL')
+        m.width = bevel
+        m.segments = segs
+        m.limit_method = 'NONE'
+        bpy.ops.object.modifier_apply(modifier="bevel")
     smooth()
     if material:
         o.data.materials.append(material)
@@ -180,7 +181,14 @@ plastic = mat("GlossWhite", base=(0.92, 0.92, 0.9), rough=0.12, coat=1.0)
 seam = mat("Seam", base=(0.05, 0.05, 0.05), rough=0.6)
 led = mat("LED", base=(0.2, 0.9, 0.4), rough=0.3)
 cw, cd, ch = 0.62, 0.26, 0.5
-rounded_box("Case", (cw, cd, ch), 0.12, segs=10, loc=(0, 0, ch / 2), material=plastic)
-rounded_box("Seam", (cw + 0.004, cd + 0.004, 0.008), 0.003, loc=(0, 0, ch * 0.72), material=seam)
+case_ = rounded_box("Case", (cw, cd, ch), 0.12, segs=10, loc=(0, 0, ch / 2), material=plastic)
+# lid seam: a thin groove cut into the case (not a plate wrapped around it)
+outer_ring = rounded_box("GrooveCut", (cw + 0.1, cd + 0.1, 0.006), 0.0, loc=(0, 0, ch * 0.72))
+keep = rounded_box("GrooveKeep", (cw - 0.012, cd - 0.012, 0.03), 0.11, segs=10, loc=(0, 0, ch * 0.72))
+bm = outer_ring.modifiers.new("b", 'BOOLEAN'); bm.operation = 'DIFFERENCE'; bm.solver = 'EXACT'; bm.object = keep
+bpy.context.view_layer.objects.active = outer_ring; bpy.ops.object.modifier_apply(modifier="b")
+bpy.data.objects.remove(keep, do_unlink=True)
+boolean(case_, outer_ring)
+case_.data.materials.append(seam) if len(case_.data.materials) < 2 else None
 cyl("Led", 0.012, 0.01, (0, -cd / 2 - 0.002, ch * 0.45), led, rot=(math.radians(90), 0, 0))
 export("device")
