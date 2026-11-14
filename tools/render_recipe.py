@@ -27,7 +27,7 @@ else:
     recipe = apply_options(base, {**defaults(base), **extra})
 
 KIND = {"rect": "AREA", "spot": "SPOT", "point": "POINT", "sun": "SUN"}
-BACKDROP = {"black_glossy": 0.004, "black": 0.008, "white": 0.85, "dark_gradient": 0.03, "light_gradient": 0.6}
+BACKDROP = {"white_glossy": 0.85, "black_glossy": 0.004, "black": 0.008, "white": 0.85, "dark_gradient": 0.03, "light_gradient": 0.6}
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 bpy.ops.import_scene.gltf(filepath=model)
@@ -63,7 +63,8 @@ m = bpy.data.materials.new("Backdrop"); m.use_nodes = True
 b = m.node_tree.nodes["Principled BSDF"]
 b.inputs["Base Color"].default_value = (alb, alb, alb, 1)
 b.inputs["Roughness"].default_value = {"black": 0.95, "black_glossy": 0.04}.get(bd, 0.8)
-if bd == "black_glossy":
+if bd in ("black_glossy", "white_glossy"):
+    b.inputs["Roughness"].default_value = 0.04 if bd == "black_glossy" else 0.08
     b.inputs["Coat Weight"].default_value = 1.0  # acrylic: clean mirror reflection
 elif bd == "black":
     b.inputs["Specular IOR Level"].default_value = 0.0  # truly matte: no blurry reflection of the bright subject

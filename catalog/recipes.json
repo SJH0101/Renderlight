@@ -1,5 +1,5 @@
 {
-  "_coords": "az: 0 = camera side, +90 = camera right, 180 = behind subject. el: elevation in degrees. dist/size: multiples of subject size (sun size = degrees). ratio: brightness relative to key. spread: area-light beam angle in degrees (smaller = less spill). subject_only: the light touches only the subject, never the floor/backdrop. backdrop: black (fully matte) | black_glossy (acrylic, mirror reflection) | white | dark_gradient | light_gradient. world.reflect: {strength} = a soft gradient (bright above, dark below) seen only in reflections; the camera still sees the dark background. backdrop_only: the light touches only the backdrop. flags: camera-invisible black cards [{az, el, dist, size}] that glass edges refract into dark outlines.",
+  "_coords": "az: 0 = camera side, +90 = camera right, 180 = behind subject. el: elevation in degrees. dist/size: multiples of subject size (sun size = degrees). ratio: brightness relative to key. spread: area-light beam angle in degrees (smaller = less spill). subject_only: the light touches only the subject, never the floor/backdrop. backdrop: black (fully matte) | black_glossy (black acrylic) | white | white_glossy (white acrylic) | dark_gradient | light_gradient. world.reflect: {strength} = a soft gradient (bright above, dark below) seen only in reflections; the camera still sees the dark background. backdrop_only: the light touches only the backdrop. flags: camera-invisible black cards [{az, el, dist, size}] that glass edges refract into dark outlines.",
   "recipes": [
     {
       "id": "luxury_glass_darkfield",
@@ -311,9 +311,71 @@
         "병 뒤에 라이트를 두고 유리를 통해 비추기 (병이 뿌연 흰 덩어리가 된다)",
         "배경을 비추는 라이트가 병까지 비추게 두기 → backdrop_only",
         "양옆까지 전부 밝게 두기 (윤곽선이 생길 어두운 면이 없어진다) → 검은 플래그",
-        "정면을 비워두기 (금박·금속 로고가 밝은 주변을 비춰 하얗게 묻힌다) → 카메라 쪽에 크고 가까운 검은 플래그"
+        "정면을 비워두기 (금박·금속 로고가 밝은 주변을 비춰 하얗게 묻힌다) → 카메라 쪽에 크고 가까운 검은 플래그",
+        "투명 유리에서 진한 그림자를 기대하기 (빛이 통과해 그림자가 약하다) → 아크릴 반사로 바닥에 붙인다"
       ],
       "options": [
+        {
+          "id": "floor",
+          "ask": {
+            "ko": "바닥은 어떻게 할까?",
+            "en": "Floor?"
+          },
+          "default": "acrylic",
+          "choices": [
+            {
+              "id": "plain",
+              "label": {
+                "ko": "그림자 없음",
+                "en": "No shadow"
+              },
+              "note": "가장 깨끗하지만 병이 살짝 떠 보인다",
+              "patch": {}
+            },
+            {
+              "id": "soft_shadow",
+              "label": {
+                "ko": "부드러운 그림자",
+                "en": "Soft shadow"
+              },
+              "note": "병 밑에 그림자가 퍼진다. 배경이 약간 고르지 않게 된다",
+              "patch": {
+                "ratio_scale": {
+                  "bg_left": 0.47,
+                  "bg_right": 0.47
+                },
+                "add_lights": [
+                  {
+                    "role": "shadow_key",
+                    "kind": "rect",
+                    "az": 165,
+                    "el": 50,
+                    "dist": 1.6,
+                    "ratio": 4.5,
+                    "size": [
+                      0.9,
+                      0.9
+                    ],
+                    "kelvin": 6000,
+                    "backdrop_only": true
+                  }
+                ],
+                "exposure": 0.45
+              }
+            },
+            {
+              "id": "acrylic",
+              "label": {
+                "ko": "흰 아크릴 반사",
+                "en": "White acrylic"
+              },
+              "note": "바닥에 은은하게 비쳐 병이 바닥에 붙어 보인다",
+              "patch": {
+                "backdrop": "white_glossy"
+              }
+            }
+          ]
+        },
         {
           "id": "tone",
           "ask": {

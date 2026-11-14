@@ -3,14 +3,15 @@
 A choice's `patch` may only use these keys:
   backdrop        "black" | "black_glossy" | "white" | "dark_gradient" | "light_gradient"
   kelvin          color temperature for every light (or {"role": K, ...} per light)
-  ratio_scale     multiply every light's brightness
+  ratio_scale     multiply every light's brightness (or {"role": x, ...} per light)
+  add_lights      extra lights to add, same fields as rig entries
   size_scale      multiply every light's size (bigger = softer)
   exposure        overall exposure in stops
   world_strength  ambient light level
 """
 import copy
 
-ALLOWED = {"backdrop", "kelvin", "ratio_scale", "size_scale", "exposure", "world_strength"}
+ALLOWED = {"backdrop", "kelvin", "ratio_scale", "size_scale", "exposure", "world_strength", "add_lights"}
 
 
 def apply_options(recipe, chosen):
@@ -39,10 +40,14 @@ def apply_options(recipe, chosen):
                 l["kelvin"] = k.get(l["role"], l.get("kelvin", 5600)) if isinstance(k, dict) else k
                 l.pop("color", None) if not isinstance(k, dict) or l["role"] in k else None
             if "ratio_scale" in patch:
-                l["ratio"] = l.get("ratio", 1.0) * patch["ratio_scale"]
+                rs = patch["ratio_scale"]
+                f = rs.get(l["role"], 1.0) if isinstance(rs, dict) else rs
+                l["ratio"] = l.get("ratio", 1.0) * f
             if "size_scale" in patch:
                 s = l.get("size", 0.5)
                 l["size"] = [v * patch["size_scale"] for v in s] if isinstance(s, list) else s * patch["size_scale"]
+        if "add_lights" in patch:
+            r["rig"] += copy.deepcopy(patch["add_lights"])
     return r
 
 
