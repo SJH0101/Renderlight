@@ -68,20 +68,84 @@ def export(name):
     print("wrote", path)
 
 
-# ---------- 1. perfume bottle: thick glass, amber liquid, gold neck, black cap ----------
+# ---------- 1. perfume bottle: hollow thick glass, heavy base, amber liquid, gold foil logo, grooved cap ----------
+def smudge_texture(path, res=512, seed=3):
+    """Roughness map: clean glass (low) with faint fingerprints/smudges (higher)."""
+    import numpy as np
+    from PIL import Image, ImageFilter
+    rng = np.random.default_rng(seed)
+    img = np.full((res, res), 10, np.float32)          # ~0.04 roughness
+    for _ in range(14):                                 # smudges
+        x, y, r = rng.integers(0, res, 2).tolist() + [int(rng.integers(20, 70))]
+        yy, xx = np.ogrid[:res, :res]
+        img += 30 * np.exp(-((xx - x) ** 2 + (yy - y) ** 2) / (2 * r * r))
+    for _ in range(4):                                  # fingerprint-ish ridges
+        x, y = rng.integers(60, res - 60, 2)
+        yy, xx = np.ogrid[:res, :res]
+        d = np.sqrt((xx - x) ** 2 + ((yy - y) * 1.3) ** 2)
+        img += np.where(d < 45, 18 * (0.5 + 0.5 * np.sin(d * 0.9)), 0)
+    im = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(1.2))
+    rgb = Image.merge("RGB", (im, im, im))
+    rgb.save(path)
+    return path
+
+
+def boolean(target, cutter):
+    m = target.modifiers.new("bool", 'BOOLEAN')
+    m.operation = 'DIFFERENCE'; m.solver = 'EXACT'; m.object = cutter
+    bpy.context.view_layer.objects.active = target
+    bpy.ops.object.modifier_apply(modifier="bool")
+    bpy.data.objects.remove(cutter, do_unlink=True)
+
+
 reset()
-glass = mat("Glass", base=(1, 1, 1), rough=0.02, transmission=1.0, ior=1.5)
-liquid = mat("Perfume", base=(0.95, 0.62, 0.25), rough=0.0, transmission=1.0, ior=1.33)
-gold = mat("Gold", base=(1.0, 0.78, 0.42), metallic=1.0, rough=0.18)
-cap = mat("CapBlack", base=(0.01, 0.01, 0.01), rough=0.15, coat=1.0)
-W, D, H = 0.62, 0.26, 0.78
-rounded_box("Bottle", (W, D, H), 0.06, loc=(0, 0, H / 2), material=glass)
-# liquid sits inside the thick glass walls, filled to 75%
-lw, ld, lh = W - 0.09, D - 0.08, (H - 0.14) * 0.75
-rounded_box("Liquid", (lw, ld, lh), 0.03, loc=(0, 0, 0.1 + lh / 2), material=liquid)
-cyl("Neck", 0.07, 0.06, (0, 0, H + 0.03), gold)
-rounded_box("Cap", (0.3, 0.3, 0.26), 0.03, loc=(0, 0, H + 0.06 + 0.13), material=cap)
+tex_path = smudge_texture(os.path.join(OUT, "_glass_rough.png"))
+glass = mat("Glass", base=(1, 1, 1), rough=0.03, transmission=1.0, ior=1.5)
+img = bpy.data.images.load(tex_path); img.colorspace_settings.name = "Non-Color"
+nt = glass.node_tree
+ti = nt.nodes.new("ShaderNodeTexImage"); ti.image = img
+sep = nt.nodes.new("ShaderNodeSeparateColor")
+nt.links.new(ti.outputs["Color"], sep.inputs["Color"])
+nt.links.new(sep.outputs["Green"], nt.nodes["Principled BSDF"].inputs["Roughness"])
+liquid = mat("Perfume", base=(0.95, 0.6, 0.22), rough=0.0, transmission=1.0, ior=1.33)
+gold = mat("Gold", base=(1.0, 0.77, 0.4), metallic=1.0, rough=0.16)
+foil = mat("GoldFoil", base=(1.0, 0.78, 0.42), metallic=1.0, rough=0.28)
+cap = mat("CapBlack", base=(0.012, 0.012, 0.012), rough=0.12, coat=1.0)
+
+W, D, H = 0.62, 0.30, 0.78
+WALL, BASE = 0.05, 0.13
+outer = rounded_box("Bottle", (W, D, H), 0.11, segs=10, loc=(0, 0, H / 2), material=glass)
+iw, idp, ih = W - 2 * WALL, D - 2 * WALL, H - BASE - WALL
+inner = rounded_box("Cavity", (iw, idp, ih + 0.2), 0.07, segs=8, loc=(0, 0, BASE + (ih + 0.2) / 2))
+boolean(outer, inner)
+# simple box UVs so the smudge map lands on the glass
+bpy.context.view_layer.objects.active = outer
+bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.select_all(action='SELECT')
+bpy.ops.uv.cube_project(cube_size=1.0); bpy.ops.object.mode_set(mode='OBJECT')
+smooth(30)
+lh = ih * 0.75
+rounded_box("Liquid", (iw - 0.006, idp - 0.006, lh), 0.065, segs=8, loc=(0, 0, BASE + lh / 2 + 0.002), material=liquid)
+cyl("Neck", 0.06, 0.06, (0, 0, H + 0.03), glass)
+cyl("Collar", 0.085, 0.04, (0, 0, H + 0.07), gold)
+capo = rounded_box("Cap", (0.32, 0.32, 0.26), 0.035, loc=(0, 0, H + 0.09 + 0.13), material=cap)
+groove = rounded_box("CapGroove", (0.34, 0.34, 0.012), 0.004, loc=(0, 0, H + 0.09 + 0.06))
+boolean(capo, groove)
+# gold foil wordmark on the front (invented brand)
+bpy.ops.object.text_add(location=(0, -D / 2 - 0.0015, H * 0.62), rotation=(math.radians(90), 0, 0))
+t = bpy.context.active_object
+t.data.body = "LUMEN"
+t.data.align_x = 'CENTER'; t.data.align_y = 'CENTER'
+t.data.size = 0.085; t.data.extrude = 0.0008; t.data.space_character = 1.35
+bpy.ops.object.convert(target='MESH')
+t.name = "Wordmark"; t.data.materials.append(foil)
+bpy.ops.object.text_add(location=(0, -D / 2 - 0.0015, H * 0.52), rotation=(math.radians(90), 0, 0))
+t2 = bpy.context.active_object
+t2.data.body = "EAU DE PARFUM"; t2.data.align_x = 'CENTER'; t2.data.align_y = 'CENTER'
+t2.data.size = 0.028; t2.data.extrude = 0.0006; t2.data.space_character = 1.6
+bpy.ops.object.convert(target='MESH')
+t2.name = "Subline"; t2.data.materials.append(foil)
 export("perfume")
+os.remove(tex_path)
 
 # ---------- 2. chrome watch: polished case, sapphire glass, dark dial, leather strap ----------
 reset()

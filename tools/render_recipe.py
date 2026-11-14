@@ -71,6 +71,8 @@ me.materials.append(m)
 
 # lights from the recipe, in subject/camera coordinates
 ctx = ns["lt_setup"](rid, subject=[o.name for o in meshes])
+backdrop_col = bpy.data.collections.new("LT_BackdropOnly")
+backdrop_col.objects.link(sweep)
 subject_col = bpy.data.collections.new("LT_SubjectOnly")
 for o in meshes:
     subject_col.objects.link(o)
@@ -82,6 +84,29 @@ for l in recipe["rig"]:
     if l.get("subject_only"):  # light linking: this light does not touch the floor/backdrop
         lo_ = bpy.data.objects["LT_" + l["role"]]
         lo_.light_linking.receiver_collection = subject_col
+    if l.get("backdrop_only"):  # lights the backdrop evenly without touching the subject
+        bpy.data.objects["LT_" + l["role"]].light_linking.receiver_collection = backdrop_col
+# black flags: camera-invisible black cards beside the subject. Glass edges refract them into dark outlines.
+for i, f in enumerate(recipe.get("flags", [])):
+    fm = bpy.data.meshes.new(f"Flag{i}")
+    fm.from_pydata([(-.5, -.5, 0), (.5, -.5, 0), (.5, .5, 0), (-.5, .5, 0)], [], [(0, 1, 2, 3)])
+    fo = bpy.data.objects.new(f"LT_Flag{i}", fm)
+    d = ns["lt_dir"](ctx, f["az"], f.get("el", 0))
+    fo.location = ctx["center"] + d * f.get("dist", 1.0) * size
+    w_, h_ = f.get("size", [0.8, 2.0])
+    fo.scale = (w_ * size, h_ * size, 1)
+    fo.rotation_mode = 'QUATERNION'
+    fo.rotation_quaternion = (ctx["center"] - fo.location).to_track_quat('Z', 'Y')
+    bpy.context.scene.collection.objects.link(fo)
+    fmat = bpy.data.materials.new("Flag"); fmat.use_nodes = True
+    fb = fmat.node_tree.nodes["Principled BSDF"]
+    fb.inputs["Base Color"].default_value = (0, 0, 0, 1)
+    fb.inputs["Roughness"].default_value = 1.0
+    fb.inputs["Specular IOR Level"].default_value = 0.0
+    fm.materials.append(fmat)
+    fo.visible_camera = False
+    fo.visible_shadow = False
+
 w = recipe.get("world", {})
 ns["lt_world"](strength=w.get("strength", 0.0), color=tuple(w.get("color", (1, 1, 1))), exposure=recipe.get("exposure"))
 
