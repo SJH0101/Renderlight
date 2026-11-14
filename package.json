@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/SJH0101/renderlight#readme",
   "dependencies": {
+    "pretendard": "^1.3.9",
     "three": "^0.187.0"
   },
   "devDependencies": {

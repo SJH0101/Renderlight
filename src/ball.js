@@ -13,7 +13,8 @@ export class LightBall {
     this.selected = null;
     this.drag = null;
     this.size = canvas.width;
-    this.R = this.size * 0.42;
+    this.R = this.size * 0.44;
+    this.k = this.size / 260; // dot sizes scale with canvas resolution
     this.img = this.g.createImageData(this.size, this.size);
     canvas.addEventListener('pointerdown', (ev) => this._down(ev));
     canvas.addEventListener('pointermove', (ev) => this._move(ev));
@@ -141,7 +142,7 @@ export class LightBall {
     g.putImageData(img, 0, 0);
     // rim
     g.strokeStyle = 'rgba(255,255,255,0.25)';
-    g.lineWidth = 1.5;
+    g.lineWidth = 1.5 * this.k;
     g.beginPath(); g.arc(half, half, R, 0, Math.PI * 2); g.stroke();
     // dots
     for (const { e, v } of this._dots()) {
@@ -149,17 +150,17 @@ export class LightBall {
       const rgb = (e.color || kelvinToRGB(e.kelvin || 5600)).map((c) => Math.round(c * 255));
       const sel = e === this.selected;
       g.beginPath();
-      g.arc(x, y, sel ? 9 : 7, 0, Math.PI * 2);
+      g.arc(x, y, (sel ? 9 : 7) * this.k, 0, Math.PI * 2);
       if (v.z >= 0) {
         g.fillStyle = e.on ? `rgb(${rgb})` : '#555';
         g.fill();
-        g.strokeStyle = sel ? '#fff' : 'rgba(0,0,0,0.7)';
-        g.lineWidth = sel ? 3 : 1.5;
+        g.strokeStyle = sel ? '#fff' : 'rgba(0,0,0,0.55)';
+        g.lineWidth = (sel ? 3 : 1.5) * this.k;
         g.stroke();
       } else {
         g.strokeStyle = e.on ? `rgb(${rgb})` : '#555';
-        g.lineWidth = sel ? 3.5 : 2.5;
-        g.setLineDash([3, 3]);
+        g.lineWidth = (sel ? 3.5 : 2.5) * this.k;
+        g.setLineDash([3 * this.k, 3 * this.k]);
         g.stroke();
         g.setLineDash([]);
       }
