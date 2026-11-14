@@ -1,0 +1,27 @@
+{
+  "name": "renderlight",
+  "version": "0.1.0",
+  "description": "Light a 3D model without touching numbers",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SJH0101/renderlight.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SJH0101/renderlight/issues"
+  },
+  "homepage": "https://github.com/SJH0101/renderlight#readme",
+  "dependencies": {
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "vite": "^8.3.8"
+  },
+  "type": "module",
+  "private": true
+}
