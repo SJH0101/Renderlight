@@ -1,5 +1,5 @@
 {
-  "_coords": "az: 0 = camera side, +90 = camera right, 180 = behind subject. el: elevation in degrees. dist/size: multiples of subject size (sun size = degrees). ratio: brightness relative to key. spread: area-light beam angle in degrees (smaller = less spill). subject_only: the light touches only the subject, never the floor/backdrop. backdrop: black (fully matte) | black_glossy (acrylic, mirror reflection) | white | dark_gradient | light_gradient.",
+  "_coords": "az: 0 = camera side, +90 = camera right, 180 = behind subject. el: elevation in degrees. dist/size: multiples of subject size (sun size = degrees). ratio: brightness relative to key. spread: area-light beam angle in degrees (smaller = less spill). subject_only: the light touches only the subject, never the floor/backdrop. backdrop: black (fully matte) | black_glossy (acrylic, mirror reflection) | white | dark_gradient | light_gradient. world.reflect: {strength} = a soft gradient (bright above, dark below) seen only in reflections; the camera still sees the dark background.",
   "recipes": [
     {
       "id": "luxury_glass_darkfield",
@@ -558,59 +558,84 @@
         "sparkle",
         "dark"
       ],
-      "look": "금속 표면에 큰 면광원이 길게 비쳐 형태를 그리고, 작은 포인트 라이트가 보석에 반짝임을 찍는다.",
+      "look": "어두운 배경 위에서 광택 금속 링이 위는 밝고 아래로 갈수록 어두워지는 그라데이션 반사로 형태를 드러낸다. 눈금과 바늘에는 또렷한 반짝임이 맺힌다.",
       "rig": [
         {
-          "role": "reflection_panel",
+          "role": "overhead_softbox",
           "kind": "rect",
-          "az": 30,
-          "el": 35,
-          "dist": 1.0,
-          "ratio": 1.0,
+          "az": 0,
+          "el": 75,
+          "dist": 1.1,
+          "ratio": 1.5,
           "size": [
-            1.8,
-            0.6
+            2.4,
+            1.6
           ],
-          "kelvin": 5600
+          "kelvin": 5600,
+          "subject_only": true
+        },
+        {
+          "role": "strip_left",
+          "kind": "rect",
+          "az": -75,
+          "el": 10,
+          "dist": 1.1,
+          "ratio": 1.5,
+          "size": [
+            0.4,
+            2.0
+          ],
+          "kelvin": 5600,
+          "subject_only": true
+        },
+        {
+          "role": "strip_right",
+          "kind": "rect",
+          "az": 75,
+          "el": 10,
+          "dist": 1.1,
+          "ratio": 1.2,
+          "size": [
+            0.4,
+            2.0
+          ],
+          "kelvin": 5600,
+          "subject_only": true
         },
         {
           "role": "sparkle",
           "kind": "point",
-          "az": -40,
-          "el": 50,
-          "dist": 1.4,
-          "ratio": 0.9,
-          "size": 0.02,
-          "kelvin": 6500
-        },
-        {
-          "role": "rim",
-          "kind": "spot",
-          "az": 160,
+          "az": 25,
           "el": 30,
-          "dist": 1.3,
-          "ratio": 0.8,
-          "size": 0.2,
-          "kelvin": 5600
+          "dist": 1.4,
+          "ratio": 2.0,
+          "size": 0.01,
+          "kelvin": 6500
         }
       ],
       "world": {
-        "strength": 0.02,
+        "strength": 0.0,
         "color": [
-          0.05,
-          0.05,
-          0.06
-        ]
+          0,
+          0,
+          0
+        ],
+        "reflect": {
+          "strength": 0.8
+        }
       },
       "backdrop": "black",
       "checks": [
-        "금속면에 길고 매끈한 반사가 형태를 따라 흐른다",
-        "보석이나 모서리에 작은 반짝임 점이 있다",
-        "배경이 어두워 금속이 떠 보인다"
+        "배경 위쪽 평균 밝기 30/255 이하",
+        "제품 영역 평균 밝기 35/255 이상 (너무 어두우면 노출부터 올린다)",
+        "금속 링에 밝은 반사와 어두운 반사가 함께 보인다 (한 색으로 뭉개지지 않음)",
+        "작은 광택 부품(눈금, 바늘, 모서리)에 반짝임이 있다",
+        "하얗게 날아간 픽셀 1% 이하"
       ],
       "avoid": [
-        "작은 라이트만 써서 금속이 검게 죽음",
-        "반사 안에 지저분한 주변 환경이 비침"
+        "금속 주변을 전부 검게 두기 (광택 금속은 비칠 게 없으면 검게 죽는다) → world.reflect로 반사에만 그라데이션을 준다",
+        "라이트를 하나씩 더해서 금속을 살리려 하기 (얇은 띠에만 비친다)",
+        "정면 라이트로 유리(크리스탈)에 큰 반사를 만들어 다이얼을 가리기"
       ],
       "options": [
         {
@@ -677,7 +702,12 @@
             }
           ]
         }
-      ]
+      ],
+      "exposure": 0.7,
+      "verified": {
+        "blender_cycles": "2026-11-14",
+        "model": "public/models/watch.glb"
+      }
     }
   ],
   "_options": "Each recipe lists option groups the AI must offer the user as a multiple-choice question (or numbered list). A choice's patch uses only the keys in catalog/apply.py."

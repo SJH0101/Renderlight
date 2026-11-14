@@ -85,6 +85,28 @@ for l in recipe["rig"]:
 w = recipe.get("world", {})
 ns["lt_world"](strength=w.get("strength", 0.0), color=tuple(w.get("color", (1, 1, 1))), exposure=recipe.get("exposure"))
 
+# Reflection-only studio: the camera sees a dark background, but reflective surfaces see a
+# soft gradient (bright above, dark below). This is how metal gets shape without lighting the background.
+env = w.get("reflect")
+if env:
+    wt = bpy.context.scene.world.node_tree
+    nodes, links = wt.nodes, wt.links
+    out_ = next(n for n in nodes if n.type == 'OUTPUT_WORLD')
+    bg_cam = next(n for n in nodes if n.type == 'BACKGROUND')
+    tc = nodes.new("ShaderNodeTexCoord"); sep = nodes.new("ShaderNodeSeparateXYZ")
+    mr = nodes.new("ShaderNodeMapRange")
+    mr.inputs["From Min"].default_value = -0.1; mr.inputs["From Max"].default_value = 0.9
+    bg_ref = nodes.new("ShaderNodeBackground")
+    bg_ref.inputs["Strength"].default_value = env.get("strength", 0.6)
+    lp = nodes.new("ShaderNodeLightPath"); mix = nodes.new("ShaderNodeMixShader")
+    links.new(tc.outputs["Generated"], sep.inputs[0])
+    links.new(sep.outputs["Z"], mr.inputs["Value"])
+    links.new(mr.outputs["Result"], bg_ref.inputs["Color"])
+    links.new(lp.outputs["Is Camera Ray"], mix.inputs[0])
+    links.new(bg_ref.outputs[0], mix.inputs[1])
+    links.new(bg_cam.outputs[0], mix.inputs[2])
+    links.new(mix.outputs[0], out_.inputs["Surface"])
+
 sc = bpy.context.scene
 sc.render.engine = 'CYCLES'
 sc.cycles.samples = SAMPLES

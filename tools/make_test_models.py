@@ -86,7 +86,7 @@ export("perfume")
 # ---------- 2. chrome watch: polished case, sapphire glass, dark dial, leather strap ----------
 reset()
 chrome = mat("Chrome", base=(0.95, 0.95, 0.95), metallic=1.0, rough=0.08)
-brushed = mat("Brushed", base=(0.9, 0.9, 0.9), metallic=1.0, rough=0.3)
+brushed = mat("Bezel", base=(0.95, 0.95, 0.95), metallic=1.0, rough=0.07)  # polished bezel
 sapphire = mat("Sapphire", base=(1, 1, 1), rough=0.0, transmission=1.0, ior=1.77)
 dial = mat("Dial", base=(0.02, 0.03, 0.06), rough=0.35)
 hands = mat("Hands", base=(0.95, 0.95, 0.95), metallic=1.0, rough=0.1)
