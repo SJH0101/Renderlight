@@ -20,7 +20,7 @@ recipes = {r["id"]: r for r in json.load(open(os.path.join(ROOT, "catalog/recipe
 recipe = override or recipes[rid]
 
 KIND = {"rect": "AREA", "spot": "SPOT", "point": "POINT", "sun": "SUN"}
-BACKDROP = {"black": 0.008, "white": 0.85, "dark_gradient": 0.03, "light_gradient": 0.6}
+BACKDROP = {"black_glossy": 0.004, "black": 0.008, "white": 0.85, "dark_gradient": 0.03, "light_gradient": 0.6}
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 bpy.ops.import_scene.gltf(filepath=model)
@@ -55,16 +55,26 @@ bpy.context.scene.collection.objects.link(sweep)
 m = bpy.data.materials.new("Backdrop"); m.use_nodes = True
 b = m.node_tree.nodes["Principled BSDF"]
 b.inputs["Base Color"].default_value = (alb, alb, alb, 1)
-b.inputs["Roughness"].default_value = 0.95 if bd == "black" else 0.8
+b.inputs["Roughness"].default_value = {"black": 0.95, "black_glossy": 0.04}.get(bd, 0.8)
+if bd == "black_glossy":
+    b.inputs["Coat Weight"].default_value = 1.0  # acrylic: clean mirror reflection
+elif bd == "black":
+    b.inputs["Specular IOR Level"].default_value = 0.0  # truly matte: no blurry reflection of the bright subject
 me.materials.append(m)
 
 # lights from the recipe, in subject/camera coordinates
 ctx = ns["lt_setup"](rid, subject=[o.name for o in meshes])
+subject_col = bpy.data.collections.new("LT_SubjectOnly")
+for o in meshes:
+    subject_col.objects.link(o)
 for l in recipe["rig"]:
     size_v = tuple(l["size"]) if isinstance(l.get("size"), list) else l.get("size", 0.5)
     ns["lt_light"](ctx, l["role"], kind=KIND[l["kind"]], az=l["az"], el=l["el"], dist=l.get("dist", 1.5),
                    ratio=l.get("ratio", 1.0), size=size_v, kelvin=l.get("kelvin", 5600),
                    color=tuple(l["color"]) if l.get("color") else None, spread=l.get("spread"))
+    if l.get("subject_only"):  # light linking: this light does not touch the floor/backdrop
+        lo_ = bpy.data.objects["LT_" + l["role"]]
+        lo_.light_linking.receiver_collection = subject_col
 w = recipe.get("world", {})
 ns["lt_world"](strength=w.get("strength", 0.0), color=tuple(w.get("color", (1, 1, 1))), exposure=recipe.get("exposure"))
 
@@ -75,6 +85,9 @@ sc.cycles.use_denoising = True
 sc.cycles.max_bounces = 16
 sc.cycles.transmission_bounces = 16
 sc.cycles.glossy_bounces = 8
+if recipe.get("no_caustics"):  # glass refracting light onto the floor
+    sc.cycles.caustics_refractive = False
+    sc.cycles.caustics_reflective = False
 sc.render.resolution_x = sc.render.resolution_y = RES
 sc.view_settings.view_transform = 'AgX'
 sc.render.filepath = out

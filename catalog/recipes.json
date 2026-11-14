@@ -1,5 +1,5 @@
 {
-  "_coords": "az: 0 = camera side, +90 = camera right, 180 = behind subject. el: elevation in degrees. dist/size: multiples of subject size (sun size = degrees). ratio: brightness relative to key.",
+  "_coords": "az: 0 = camera side, +90 = camera right, 180 = behind subject. el: elevation in degrees. dist/size: multiples of subject size (sun size = degrees). ratio: brightness relative to key. spread: area-light beam angle in degrees (smaller = less spill). subject_only: the light touches only the subject, never the floor/backdrop. backdrop: black (fully matte) | black_glossy (acrylic, mirror reflection) | white | dark_gradient | light_gradient.",
   "recipes": [
     {
       "id": "luxury_glass_darkfield",
@@ -32,7 +32,7 @@
         "dramatic",
         "dark"
       ],
-      "look": "검은 배경에서 병과 캡의 윤곽만 밝은 선으로 떠오른다. 몸통은 어둡고, 액체는 테두리 쪽에서만 호박색으로 빛난다. 바닥에는 병 아래로 은은한 빛이 고인다.",
+      "look": "검은 배경에서 병과 캡의 윤곽만 밝은 선으로 떠오른다. 몸통은 어둡고, 액체는 테두리 쪽에서만 호박색으로 빛난다. 바닥은 완전한 검정.",
       "rig": [
         {
           "role": "strip_left",
@@ -40,13 +40,14 @@
           "az": -150,
           "el": 10,
           "dist": 1.1,
-          "ratio": 3.0,
+          "ratio": 2.4,
           "size": [
             0.22,
             0.9
           ],
           "spread": 30,
-          "kelvin": 5600
+          "kelvin": 5600,
+          "subject_only": true
         },
         {
           "role": "strip_right",
@@ -54,13 +55,14 @@
           "az": 150,
           "el": 10,
           "dist": 1.1,
-          "ratio": 3.0,
+          "ratio": 2.4,
           "size": [
             0.22,
             0.9
           ],
           "spread": 30,
-          "kelvin": 5600
+          "kelvin": 5600,
+          "subject_only": true
         },
         {
           "role": "top_kiss",
@@ -70,7 +72,8 @@
           "dist": 1.6,
           "ratio": 0.35,
           "size": 0.6,
-          "kelvin": 4800
+          "kelvin": 4800,
+          "subject_only": true
         }
       ],
       "world": {
@@ -84,6 +87,7 @@
       "backdrop": "black",
       "checks": [
         "배경 위쪽 평균 밝기 10/255 이하",
+        "바닥 평균 밝기 10/255 이하 (반사판 변형 제외)",
         "병 양쪽 윤곽에 끊기지 않는 밝은 선 (최대 밝기 230 이상)",
         "몸통 한가운데에 하이라이트 없음 (최대 밝기 40 이하)",
         "하얗게 날아간 픽셀 1% 이하"
@@ -92,7 +96,9 @@
         "정면에서 비추는 라이트",
         "배경을 밝히는 라이트",
         "병 뒤에 라이트를 숨겨 액체를 빛내기 (유리를 통해 라이트가 그대로 보여 다크필드가 깨진다)",
-        "띠 조명을 바닥에 닿을 만큼 길게 두기 (바닥에 빛이 샌다)"
+        "띠 조명을 바닥에 닿을 만큼 길게 두기 (바닥에 빛이 샌다)",
+        "윤곽용 라이트가 바닥까지 비추게 두기 → subject_only로 끊는다",
+        "무광 바닥에 반사 성분 남기기 (밝은 병이 바닥에 뿌옇게 번진다)"
       ],
       "variations": {
         "warmer": {
@@ -106,6 +112,10 @@
         "softer": {
           "size_scale": 2.0,
           "note": "윤곽선을 굵고 부드럽게"
+        },
+        "acrylic_floor": {
+          "backdrop": "black_glossy",
+          "note": "검정 아크릴 바닥에 병이 거울처럼 비친다 (광고 느낌)"
         }
       },
       "verified": {
