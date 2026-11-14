@@ -18,8 +18,8 @@ RES, SAMPLES = 320, 16
 
 
 def choices_for(rid, group):
-    recipe = next(r for r in json.load(open(os.path.join(ROOT, "catalog/recipes.json")))["recipes"] if r["id"] == rid)
-    for g in recipe.get("options", []) + json.load(open(os.path.join(ROOT, "catalog/finishing.json")))["options"]:
+    recipe = next(r for r in json.load(open(os.path.join(ROOT, "skills/renderlight/catalog/recipes.json")))["recipes"] if r["id"] == rid)
+    for g in recipe.get("options", []) + json.load(open(os.path.join(ROOT, "skills/renderlight/catalog/finishing.json")))["options"]:
         if g["id"] == group:
             return g
     raise KeyError(f"{rid}: no question '{group}'")

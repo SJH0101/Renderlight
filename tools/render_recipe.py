@@ -16,10 +16,10 @@ def render(rid, model, out, RES=480, SAMPLES=128, extra=None):
     """Render one recipe (+ chosen options) to `out`. Safe to call repeatedly in one Blender process."""
     extra = dict(extra or {})
 
-    sys.path.insert(0, os.path.join(ROOT, "catalog"))
+    sys.path.insert(0, os.path.join(ROOT, "skills/renderlight/catalog"))
     from apply import apply_options, defaults
-    recipes = {r["id"]: r for r in json.load(open(os.path.join(ROOT, "catalog/recipes.json")))["recipes"]}
-    finishing = {g["id"]: g for g in json.load(open(os.path.join(ROOT, "catalog/finishing.json")))["options"]}
+    recipes = {r["id"]: r for r in json.load(open(os.path.join(ROOT, "skills/renderlight/catalog/recipes.json")))["recipes"]}
+    finishing = {g["id"]: g for g in json.load(open(os.path.join(ROOT, "skills/renderlight/catalog/finishing.json")))["options"]}
     fin_chosen = {k: extra.pop(k) for k in list(extra) if k in finishing}
     fin = {}
     for gid, g in finishing.items():
@@ -32,7 +32,7 @@ def render(rid, model, out, RES=480, SAMPLES=128, extra=None):
         recipe = apply_options(base, {**defaults(base), **extra})
 
     KIND = {"rect": "AREA", "spot": "SPOT", "point": "POINT", "sun": "SUN"}
-    BACKDROP = {"white_glossy": 0.85, "black_glossy": 0.004, "black": 0.008, "white": 0.85, "dark_gradient": 0.03, "light_gradient": 0.6}
+    BACKDROP = {"gray": 0.18, "white_glossy": 0.85, "black_glossy": 0.004, "black": 0.008, "white": 0.85, "dark_gradient": 0.03, "light_gradient": 0.6}
 
     bpy.ops.wm.read_factory_settings(use_empty=True)
     bpy.ops.import_scene.gltf(filepath=model)
