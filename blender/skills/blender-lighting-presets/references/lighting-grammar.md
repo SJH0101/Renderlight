@@ -8,7 +8,7 @@ AI가 "고급스러운 향수 광고"나 "공포 영화 느낌" 같은 말을 �
 - **[계산]** 그래픽스 논문에서 이미지 품질 지표로 정의해 쓴 것
 - **[해석]** 위 근거를 Renderlight 좌표계(az / el / ratio / softness)로 옮긴 우리 판단. 근거가 아니라 출발값이다
 
-모든 출처는 무료로 전문을 볼 수 있다. 예외는 따로 표시했다.
+모든 출처는 무료로 전문을 볼 수 있다. 유료 자료는 넣지 않았다. 무료 논문이 유료 자료를 인용한 경우에는 그 무료 논문을 출처로 적었다.
 
 ---
 
@@ -22,8 +22,7 @@ AI가 "고급스러운 향수 광고"나 "공포 영화 느낌" 같은 말을 �
 ### 1.2 그림자
 - **그림자를 없애는 게 능사가 아니다.** 그림자가 있으면 표정의 진정성(genuineness) 평가가 올라갔고, 분노·슬픔은 더 강하게, 기쁨은 더 약하게 느껴졌다. **[실험, n 미기재]** (Zhan 2022)
 - 키라이트 밝기와 그림자 강도는 캐릭터 감정의 강도와 호감도에 영향을 준다. 어두운 그림자는 기쁨의 강도를 낮췄다. **[실험]** (Wisessing et al. 2020, Zhan 2022에서 재인용)
-- **제품 그림자는 고급감을 높인다.** 광고 속 제품에 그림자가 있으면 시각적 선명도가 올라가고, 그게 고급스럽다는 인식으로 이어졌다. **[실험, 3개 연구]** (Sharma 2016. ⚠️ 본문 유료, 초록 기준)
-- [해석] 밝고 행복한 톤이 목적이면 `fill ratio 0.4–0.7`로 그림자를 연하게. 진지함·긴장·고급감이 목적이면 `fill ≤ 0.2`. 제품은 바닥 그림자를 지우지 않는다.
+- [해석] 밝고 행복한 톤이 목적이면 `fill ratio 0.4–0.7`로 그림자를 연하게. 진지함·긴장이 목적이면 `fill ≤ 0.2`.
 
 ### 1.3 확산광 + 방향광
 - **제품은 섞는 게 낫다.** 확산광만 / 방향광만 / 둘 다 / 둘 다 + 밝게, 네 조건을 비교한 결과, 지각된 품질은 둘을 섞었을 때 가장 높았다. **[실험, n=113]** (Bakker 2019)
@@ -40,8 +39,7 @@ AI가 "고급스러운 향수 광고"나 "공포 영화 느낌" 같은 말을 �
 ## 2. 재질 규칙
 
 ### 2.1 유리 (향수병, 와인잔, 화장품 병)
-- **윤곽만 밝히고 몸통 가운데는 비운다.** 사진가들은 보통 유리의 윤곽에만 하이라이트를 주고, 가운데에는 반사 하이라이트를 두지 않으며, 배경은 단순한 검정이나 흰색을 쓴다. **[관습]** (Usta et al. 2022이 Hunter et al.을 인용)
-- **방식을 섞지 않는다.** 유리 조명은 밝은 배경에 어두운 윤곽(브라이트필드)과 어두운 배경에 밝은 윤곽(다크필드) 두 가지가 기본이다. 유리 촬영 실패의 대부분은 두 방식을 동시에 쓰는 데서 나온다. **[관습]** (Hunter et al., *Light — Science & Magic* 6판 7장. ⚠️ 유료 책, O'Reilly 공개 미리보기 기준)
+- **윤곽만 밝히고 몸통 가운데는 비운다.** 사진가들은 보통 유리의 윤곽에만 하이라이트를 주고, 가운데에는 반사 하이라이트를 두지 않으며, 배경은 단순한 검정이나 흰색을 쓴다. **[관습]** (Usta et al. 2022. 원출처는 사진 교재 Hunter et al.)
 - 제품 연출 목적에 따라 몸통에 하이라이트를 하나 넣는 것도 괜찮다. **[관습]** (Usta et al. 2022)
 - 유리는 반사와 굴절을 동시에 해서, 모양이 복잡하면 재질이 애매하게 보일 수 있다. **[실험, 재인용]** (Usta et al. 2022이 Todd & Norman 인용)
 - [해석]
@@ -70,7 +68,7 @@ AI가 "고급스러운 향수 광고"나 "공포 영화 느낌" 같은 말을 �
 
 | 요청 예시 | 조합 | 근거가 된 규칙 |
 |---|---|---|
-| 고급 향수 / 화장품 병 | 다크필드(검은 배경 + 양옆 뒤 띠 조명) · 정면 필 없음 · 바닥 그림자 유지 | 2.1, 1.2(제품 그림자), 1.4(로우키) |
+| 고급 향수 / 화장품 병 | 다크필드(검은 배경 + 양옆 뒤 띠 조명) · 정면 필 없음 | 2.1, 1.4(로우키) |
 | 깨끗한 화장품 / 의료 | 브라이트필드(밝은 배경) · 윤곽만 어둡게 | 2.1 |
 | 전자제품 / 광택 플라스틱 | 큰 소프트박스 + 작은 하드 소스 · 선명한 하이라이트 | 1.3, 2.2 |
 | 금속 시계 / 주얼리 | 큰 면광원 반사 + 작은 포인트 하이라이트 · 어두운 배경 | 2.2, 2.3 |
@@ -93,7 +91,7 @@ AI가 렌더를 사용자에게 보여주기 전에 확인한다. 숫자는 코�
 - **히스토그램**: 한쪽으로 몰리지 않고 넓게 퍼질수록 좋다 (일반 장면 기준)
 
 **재질 점검** **[관습 / 실험, 재인용]**
-- 유리: 몸통 가운데에 큰 하이라이트가 있는가? 다크필드와 브라이트필드가 섞였는가? (2.1)
+- 유리: 몸통 가운데에 큰 하이라이트가 있는가? 윤곽이 배경과 분리되는가? (2.1)
 - 광택: 하이라이트가 충분히 선명하고 대비가 있는가? 음영 방향과 하이라이트 위치가 맞는가? (2.2)
 
 **공통 실패** [해석]
@@ -115,14 +113,12 @@ AI가 렌더를 사용자에게 보여주기 전에 확인한다. 숫자는 코�
 
 - Bakker, A. (2019). *Lighting up your product! The influence of retail lighting on product perception.* 석사논문, TU Delft. https://repository.tudelft.nl/record/uuid:8e02987b-0128-40f2-8511-b851b9d2e14a
 - Huttunen, S. (2025). Faces in shadows: silhouette light, underlight and toplight elicit increased early posterior negativity. *Frontiers in Neuroscience*, 19. https://doi.org/10.3389/fnins.2025.1553977
-- Hunter, F., Biver, S., Fuqua, P., & Reid, R. (2021). *Light — Science & Magic* (6판). Routledge. ⚠️ 유료. O'Reilly 공개 미리보기와 Usta et al. (2022)의 인용으로만 확인
 - Marks, J., et al. (1997). Design Galleries: A general approach to setting parameters for computer graphics and animation. *SIGGRAPH 97*, 389–400. https://www.merl.com/publications/TR97-14
 - Pellacini, F., Battaglia, F., Morley, R. K., & Finkelstein, A. (2007). Lighting with paint. *ACM TOG*, 26(2). https://gfx.cs.princeton.edu/pubs/Pellacini_2007_LWP/lighting_with_paint.pdf
 - Poland, J. L. (2015). *Lights, Camera, Emotion!: An examination on film lighting and its impact on audiences' emotional response.* 석사논문, Cleveland State University. https://engagedscholarship.csuohio.edu/etdarchive/379/
 - Shacked, R., & Lischinski, D. (2001). Automatic lighting design using a perceptual quality metric. *Computer Graphics Forum*, 20(3), 215–227. https://pages.cs.huji.ac.il/danix-lab/cglab/research/ldesign/Shacked-eg2001.pdf
-- Sharma, N. (2016). Luxury implications of showcasing a product with its "cast" shadow. *Journal of Consumer Marketing*, 33(7), 507–516. ⚠️ 유료, 초록 기준
 - Usta, B., Pont, S., & Eisemann, E. (2022). Targeting shape and material in lighting design. *Computer Graphics Forum*, 41(7), 299–309. https://repository.tudelft.nl/record/uuid:79e4dfcd-ff32-4250-8865-81203163132b
-- Wisessing, P., Zibrek, K., Cunningham, D. W., Dingliana, J., & McDonnell, R. (2020). Enlighten me: Importance of brightness and shadow for character emotion and appeal. *ACM TOG*. (Zhan 2022를 통해 재인용)
+- Wisessing, P., Zibrek, K., Cunningham, D. W., Dingliana, J., & McDonnell, R. (2020). Enlighten me: Importance of brightness and shadow for character emotion and appeal. *ACM TOG*. (무료인 Zhan 2022를 통해 재인용. 원문은 직접 확인하지 않음)
 - Zhan (2022). 캐릭터 조명과 감정 지각에 관한 석사논문, Trinity College Dublin. https://publications.scss.tcd.ie/theses/diss/2022/TCD-SCSS-DISSERTATION-2022-061.pdf
 
 **아직 원문을 못 연 자료**: Bousseau et al. (2011) *Optimizing environment maps for material depiction*. 재질별 조명 원칙을 다룬 핵심 논문인데, 무료 저장소(HAL)가 자동 접근을 막고 있다. 지금은 Usta et al. (2022)의 정리를 통해서만 반영했다.
