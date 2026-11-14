@@ -1,5 +1,5 @@
 {
-  "_coords": "az: 0 = camera side, +90 = camera right, 180 = behind subject. el: elevation in degrees. dist/size: multiples of subject size (sun size = degrees). ratio: brightness relative to key. spread: area-light beam angle in degrees (smaller = less spill). subject_only: the light touches only the subject, never the floor/backdrop. backdrop: black (fully matte) | black_glossy (black acrylic) | white | white_glossy (white acrylic) | dark_gradient | light_gradient. world.reflect: {strength} = a soft gradient (bright above, dark below) seen only in reflections; the camera still sees the dark background. backdrop_only: the light touches only the backdrop. flags: camera-invisible black cards [{az, el, dist, size}] that glass edges refract into dark outlines.",
+  "_coords": "az: 0 = camera side, +90 = camera right, 180 = behind subject. el: elevation in degrees. dist/size: multiples of subject size (sun size = degrees). ratio: brightness relative to key. spread: area-light beam angle in degrees (smaller = less spill). subject_only: the light touches only the subject, never the floor/backdrop. backdrop: black (fully matte) | black_glossy (black acrylic) | white | white_glossy (white acrylic) | dark_gradient | light_gradient. world.reflect: {strength} = a soft gradient (bright above, dark below) seen only in reflections; the camera still sees the dark background. backdrop_only: the light touches only the backdrop. flags: camera-invisible black cards [{az, el, dist, size}] that glass edges refract into dark outlines. A flag with mirror:true is placed where the product's front face reflects the camera (metal logos and foil read dark from any angle).",
   "recipes": [
     {
       "id": "luxury_glass_darkfield",
@@ -459,12 +459,11 @@
           ]
         },
         {
-          "az": 0,
-          "el": 8,
-          "dist": 1.15,
+          "mirror": true,
+          "dist": 0.7,
           "size": [
-            3.0,
-            2.0
+            1.8,
+            1.3
           ]
         }
       ],
