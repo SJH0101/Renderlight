@@ -81,7 +81,8 @@ for l in recipe["rig"]:
     size_v = tuple(l["size"]) if isinstance(l.get("size"), list) else l.get("size", 0.5)
     ns["lt_light"](ctx, l["role"], kind=KIND[l["kind"]], az=l["az"], el=l["el"], dist=l.get("dist", 1.5),
                    ratio=l.get("ratio", 1.0), size=size_v, kelvin=l.get("kelvin", 5600),
-                   color=tuple(l["color"]) if l.get("color") else None, spread=l.get("spread"))
+                   color=tuple(l["color"]) if l.get("color") else None, spread=l.get("spread"),
+                   spot_deg=l.get("spot_deg", 40), blend=l.get("blend", 0.15))
     if l.get("subject_only"):  # light linking: this light does not touch the floor/backdrop
         lo_ = bpy.data.objects["LT_" + l["role"]]
         lo_.light_linking.receiver_collection = subject_col

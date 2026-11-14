@@ -512,7 +512,7 @@
         "modern",
         "crisp"
       ],
-      "look": "큰 소프트박스가 면을 부드럽게 감싸고, 작은 하드 라이트가 모서리에 선명한 하이라이트 한 줄을 긋는다.",
+      "look": "흰 광택 제품이 흰색 그대로 읽히고, 코팅 위로 위는 밝고 아래로 어두워지는 반사가 흐른다. 둥근 모서리를 따라 선명한 하이라이트 한 줄이 서고, 바닥에는 제품 뒤로 은은한 빛이 고인다.",
       "rig": [
         {
           "role": "key_softbox",
@@ -525,17 +525,22 @@
             1.4,
             1.0
           ],
-          "kelvin": 5800
+          "kelvin": 5800,
+          "subject_only": true
         },
         {
-          "role": "edge_accent",
-          "kind": "spot",
-          "az": -110,
-          "el": 25,
-          "dist": 1.6,
-          "ratio": 1.2,
-          "size": 0.08,
-          "kelvin": 6500
+          "role": "edge_strip",
+          "kind": "rect",
+          "az": -120,
+          "el": 15,
+          "dist": 1.2,
+          "ratio": 2.5,
+          "size": [
+            0.08,
+            1.2
+          ],
+          "kelvin": 6500,
+          "subject_only": true
         },
         {
           "role": "fill",
@@ -548,26 +553,44 @@
             1.2,
             1.2
           ],
-          "kelvin": 5800
+          "kelvin": 5800,
+          "subject_only": true
+        },
+        {
+          "role": "bg_halo",
+          "kind": "spot",
+          "az": 0,
+          "el": 55,
+          "dist": 2.6,
+          "ratio": 1.2,
+          "size": 0.3,
+          "spot_deg": 30,
+          "kelvin": 5800,
+          "backdrop_only": true
         }
       ],
       "world": {
-        "strength": 0.08,
+        "strength": 0.0,
         "color": [
-          0.12,
-          0.12,
-          0.13
-        ]
+          0,
+          0,
+          0
+        ],
+        "reflect": {
+          "strength": 0.6
+        }
       },
       "backdrop": "dark_gradient",
       "checks": [
-        "모서리를 따라 선명한 하이라이트가 하나 있다",
-        "큰 면은 부드럽게 밝아지며 얼룩이 없다",
-        "바닥에 부드러운 그림자가 남아 있다"
+        "흰 제품 영역 평균 밝기 170/255 이상 (회색으로 보이면 노출부터 올린다)",
+        "둥근 모서리에 가는 하이라이트 줄이 있다",
+        "하얗게 날아간 픽셀 1% 이하",
+        "배경이 제품보다 확실히 어둡다"
       ],
       "avoid": [
-        "면마다 하이라이트가 여러 개 흩어짐",
-        "그림자를 완전히 지운 납작한 조명"
+        "흰 제품을 노출 그대로 두기 (회색 플라스틱처럼 보인다)",
+        "광택 제품 주변을 전부 검게 두기 → world.reflect로 반사 그라데이션",
+        "하이라이트를 여러 개 흩뿌리기"
       ],
       "options": [
         {
@@ -636,7 +659,12 @@
             }
           ]
         }
-      ]
+      ],
+      "exposure": 0.5,
+      "verified": {
+        "blender_cycles": "2026-11-14",
+        "model": "public/models/device.glb"
+      }
     },
     {
       "id": "jewelry_sparkle",
