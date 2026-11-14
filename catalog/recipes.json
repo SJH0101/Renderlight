@@ -1,5 +1,5 @@
 {
-  "_coords": "az: 0 = camera side, +90 = camera right, 180 = behind subject. el: elevation in degrees. dist/size: multiples of subject size (sun size = degrees). ratio: brightness relative to key. spread: area-light beam angle in degrees (smaller = less spill). subject_only: the light touches only the subject, never the floor/backdrop. backdrop: black (fully matte) | black_glossy (acrylic, mirror reflection) | white | dark_gradient | light_gradient. world.reflect: {strength} = a soft gradient (bright above, dark below) seen only in reflections; the camera still sees the dark background.",
+  "_coords": "az: 0 = camera side, +90 = camera right, 180 = behind subject. el: elevation in degrees. dist/size: multiples of subject size (sun size = degrees). ratio: brightness relative to key. spread: area-light beam angle in degrees (smaller = less spill). subject_only: the light touches only the subject, never the floor/backdrop. backdrop: black (fully matte) | black_glossy (acrylic, mirror reflection) | white | dark_gradient | light_gradient. world.reflect: {strength} = a soft gradient (bright above, dark below) seen only in reflections; the camera still sees the dark background. backdrop_only: the light touches only the backdrop. flags: camera-invisible black cards [{az, el, dist, size}] that glass edges refract into dark outlines.",
   "recipes": [
     {
       "id": "luxury_glass_darkfield",
@@ -89,7 +89,7 @@
         "배경 위쪽 평균 밝기 10/255 이하",
         "바닥 평균 밝기 10/255 이하 (반사판 변형 제외)",
         "병 양쪽 윤곽에 끊기지 않는 밝은 선 (최대 밝기 230 이상)",
-        "몸통 한가운데에 하이라이트 없음 (최대 밝기 40 이하)",
+        "몸통 한가운데에 하이라이트 없음 (최대 밝기 60 이하, 로고 반사 제외)",
         "하얗게 날아간 픽셀 1% 이하"
       ],
       "avoid": [
@@ -98,11 +98,12 @@
         "병 뒤에 라이트를 숨겨 액체를 빛내기 (유리를 통해 라이트가 그대로 보여 다크필드가 깨진다)",
         "띠 조명을 바닥에 닿을 만큼 길게 두기 (바닥에 빛이 샌다)",
         "윤곽용 라이트가 바닥까지 비추게 두기 → subject_only로 끊는다",
-        "무광 바닥에 반사 성분 남기기 (밝은 병이 바닥에 뿌옇게 번진다)"
+        "무광 바닥에 반사 성분 남기기 (밝은 병이 바닥에 뿌옇게 번진다)",
+        "유리 표면 결점(얼룩 거칠기)을 강하게 넣기 (윤곽 빛이 유리 전체로 퍼져 몸통이 뿌옇게 뜬다)"
       ],
       "verified": {
         "blender_cycles": "2026-11-14",
-        "model": "public/models/perfume.glb"
+        "model": "public/models/perfume.glb (v2)"
       },
       "options": [
         {
@@ -246,20 +247,35 @@
         "bright",
         "minimal"
       ],
-      "look": "밝은 흰 배경 앞에서 병의 윤곽이 어두운 선으로 또렷하게 그려진다.",
+      "look": "밝고 고른 흰 배경 앞에서 병의 두꺼운 가장자리가 어두운 선으로 또렷하게 그려진다. 유리는 투명하게 비치고 묵직한 바닥이 보인다.",
       "rig": [
         {
-          "role": "backlight_panel",
+          "role": "bg_left",
           "kind": "rect",
-          "az": 180,
-          "el": 5,
-          "dist": 1.0,
-          "ratio": 2.2,
+          "az": -40,
+          "el": 35,
+          "dist": 2.2,
+          "ratio": 4.0,
           "size": [
-            1.6,
-            1.6
+            1.5,
+            1.5
           ],
-          "kelvin": 6000
+          "kelvin": 6000,
+          "backdrop_only": true
+        },
+        {
+          "role": "bg_right",
+          "kind": "rect",
+          "az": 40,
+          "el": 35,
+          "dist": 2.2,
+          "ratio": 4.0,
+          "size": [
+            1.5,
+            1.5
+          ],
+          "kelvin": 6000,
+          "backdrop_only": true
         },
         {
           "role": "soft_top",
@@ -272,11 +288,12 @@
             1.2,
             1.2
           ],
-          "kelvin": 6000
+          "kelvin": 6000,
+          "subject_only": true
         }
       ],
       "world": {
-        "strength": 0.6,
+        "strength": 0.0,
         "color": [
           1,
           1,
@@ -285,13 +302,14 @@
       },
       "backdrop": "white",
       "checks": [
-        "배경이 밝고 균일하다",
-        "병 윤곽이 어두운 선으로 분리된다",
-        "흰 배경이 하얗게 날아가 윤곽까지 먹지 않는다"
+        "배경 위쪽 평균 밝기 190/255 이상",
+        "병 양쪽 가장자리에 어두운 윤곽선이 있다",
+        "하얗게 날아간 픽셀 1% 이하 (배경이 날아가면 윤곽까지 먹는다)"
       ],
       "avoid": [
-        "옆에서 강하게 치는 하드 라이트",
-        "배경 밝기 얼룩"
+        "병 뒤에 라이트를 두고 유리를 통해 비추기 (병이 뿌연 흰 덩어리가 된다)",
+        "배경을 비추는 라이트가 병까지 비추게 두기 → backdrop_only",
+        "양옆까지 전부 밝게 두기 (윤곽선이 생길 어두운 면이 없어진다) → 검은 플래그"
       ],
       "options": [
         {
@@ -356,7 +374,32 @@
             }
           ]
         }
-      ]
+      ],
+      "flags": [
+        {
+          "az": -80,
+          "el": 0,
+          "dist": 0.9,
+          "size": [
+            0.9,
+            2.2
+          ]
+        },
+        {
+          "az": 80,
+          "el": 0,
+          "dist": 0.9,
+          "size": [
+            0.9,
+            2.2
+          ]
+        }
+      ],
+      "needs": "두께가 있고 모서리가 둥근 유리. 속이 꽉 찬 각진 유리 덩어리에서는 윤곽선이 거의 생기지 않는다.",
+      "verified": {
+        "blender_cycles": "2026-11-14",
+        "model": "public/models/perfume.glb (v2)"
+      }
     },
     {
       "id": "glossy_tech_hero",

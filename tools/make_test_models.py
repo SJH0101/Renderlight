@@ -74,16 +74,16 @@ def smudge_texture(path, res=512, seed=3):
     import numpy as np
     from PIL import Image, ImageFilter
     rng = np.random.default_rng(seed)
-    img = np.full((res, res), 10, np.float32)          # ~0.04 roughness
+    img = np.full((res, res), 5, np.float32)           # ~0.02 roughness (clean glass)
     for _ in range(14):                                 # smudges
         x, y, r = rng.integers(0, res, 2).tolist() + [int(rng.integers(20, 70))]
         yy, xx = np.ogrid[:res, :res]
-        img += 30 * np.exp(-((xx - x) ** 2 + (yy - y) ** 2) / (2 * r * r))
+        img += 11 * np.exp(-((xx - x) ** 2 + (yy - y) ** 2) / (2 * r * r))
     for _ in range(4):                                  # fingerprint-ish ridges
         x, y = rng.integers(60, res - 60, 2)
         yy, xx = np.ogrid[:res, :res]
         d = np.sqrt((xx - x) ** 2 + ((yy - y) * 1.3) ** 2)
-        img += np.where(d < 45, 18 * (0.5 + 0.5 * np.sin(d * 0.9)), 0)
+        img += np.where(d < 45, 7 * (0.5 + 0.5 * np.sin(d * 0.9)), 0)
     im = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(1.2))
     rgb = Image.merge("RGB", (im, im, im))
     rgb.save(path)
