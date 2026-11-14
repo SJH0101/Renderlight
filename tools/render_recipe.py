@@ -1,6 +1,7 @@
 """Render a catalog recipe on a test model (Blender / Cycles).
 
-    python3 tools/render_recipe.py <recipe_id> <model.glb> <out.png> [res] [samples] [overrides.json]
+    python3 tools/render_recipe.py <recipe_id> <model.glb> <out.png> [res] [samples] ['{"floor":"acrylic"}']
+The last argument is the user's chosen options (or a full recipe JSON with a "rig" key, for tuning).
 """
 import sys, os, json, math
 import bpy
@@ -14,10 +15,16 @@ exec(open(os.path.join(SCRIPTS, "lt_helpers.py")).read(), ns)
 rid, model, out = sys.argv[1], sys.argv[2], sys.argv[3]
 RES = int(sys.argv[4]) if len(sys.argv) > 4 else 480
 SAMPLES = int(sys.argv[5]) if len(sys.argv) > 5 else 128
-override = json.loads(sys.argv[6]) if len(sys.argv) > 6 else None
+extra = json.loads(sys.argv[6]) if len(sys.argv) > 6 else {}
 
+sys.path.insert(0, os.path.join(ROOT, "catalog"))
+from apply import apply_options, defaults
 recipes = {r["id"]: r for r in json.load(open(os.path.join(ROOT, "catalog/recipes.json")))["recipes"]}
-recipe = override or recipes[rid]
+if "rig" in extra:
+    recipe = extra
+else:
+    base = recipes[rid]
+    recipe = apply_options(base, {**defaults(base), **extra})
 
 KIND = {"rect": "AREA", "spot": "SPOT", "point": "POINT", "sun": "SUN"}
 BACKDROP = {"black_glossy": 0.004, "black": 0.008, "white": 0.85, "dark_gradient": 0.03, "light_gradient": 0.6}

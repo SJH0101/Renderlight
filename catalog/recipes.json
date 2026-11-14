@@ -100,28 +100,118 @@
         "윤곽용 라이트가 바닥까지 비추게 두기 → subject_only로 끊는다",
         "무광 바닥에 반사 성분 남기기 (밝은 병이 바닥에 뿌옇게 번진다)"
       ],
-      "variations": {
-        "warmer": {
-          "kelvin": 3200,
-          "note": "금빛 띠"
-        },
-        "colder": {
-          "kelvin": 9000,
-          "note": "차갑고 날카로운 띠"
-        },
-        "softer": {
-          "size_scale": 2.0,
-          "note": "윤곽선을 굵고 부드럽게"
-        },
-        "acrylic_floor": {
-          "backdrop": "black_glossy",
-          "note": "검정 아크릴 바닥에 병이 거울처럼 비친다 (광고 느낌)"
-        }
-      },
       "verified": {
         "blender_cycles": "2026-11-14",
         "model": "public/models/perfume.glb"
-      }
+      },
+      "options": [
+        {
+          "id": "floor",
+          "ask": {
+            "ko": "바닥은 어떻게 할까?",
+            "en": "Floor?"
+          },
+          "default": "matte",
+          "choices": [
+            {
+              "id": "matte",
+              "label": {
+                "ko": "무광 검정",
+                "en": "Matte black"
+              },
+              "note": "반사 없이 피사체만 떠 있다",
+              "patch": {
+                "backdrop": "black"
+              }
+            },
+            {
+              "id": "acrylic",
+              "label": {
+                "ko": "검정 아크릴",
+                "en": "Black acrylic"
+              },
+              "note": "바닥에 거울처럼 비친다 (광고 느낌)",
+              "patch": {
+                "backdrop": "black_glossy"
+              }
+            }
+          ]
+        },
+        {
+          "id": "tone",
+          "ask": {
+            "ko": "빛 색은?",
+            "en": "Light color?"
+          },
+          "default": "neutral",
+          "choices": [
+            {
+              "id": "neutral",
+              "label": {
+                "ko": "중립",
+                "en": "Neutral"
+              },
+              "note": "흰 윤곽선",
+              "patch": {
+                "kelvin": 5600
+              }
+            },
+            {
+              "id": "gold",
+              "label": {
+                "ko": "금빛",
+                "en": "Gold"
+              },
+              "note": "따뜻하고 고전적인 고급감",
+              "patch": {
+                "kelvin": 3000
+              }
+            },
+            {
+              "id": "cold",
+              "label": {
+                "ko": "차가운",
+                "en": "Cold"
+              },
+              "note": "날카롭고 현대적인 느낌",
+              "patch": {
+                "kelvin": 10000
+              }
+            }
+          ]
+        },
+        {
+          "id": "edge",
+          "ask": {
+            "ko": "윤곽선 굵기는?",
+            "en": "Edge width?"
+          },
+          "default": "thin",
+          "choices": [
+            {
+              "id": "thin",
+              "label": {
+                "ko": "가늘게",
+                "en": "Thin"
+              },
+              "note": "날렵한 선",
+              "patch": {}
+            },
+            {
+              "id": "wide",
+              "label": {
+                "ko": "굵게",
+                "en": "Wide"
+              },
+              "note": "부드럽고 넓은 빛 띠",
+              "patch": {
+                "size_scale": 2.2,
+                "ratio_scale": 0.8
+              }
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "clean_glass_brightfield",
@@ -203,16 +293,70 @@
         "옆에서 강하게 치는 하드 라이트",
         "배경 밝기 얼룩"
       ],
-      "variations": {
-        "warmer": {
-          "kelvin": 4500,
-          "note": "크림톤 배경"
+      "options": [
+        {
+          "id": "tone",
+          "ask": {
+            "ko": "배경 톤은?",
+            "en": "Background tone?"
+          },
+          "default": "white",
+          "choices": [
+            {
+              "id": "white",
+              "label": {
+                "ko": "순백",
+                "en": "Pure white"
+              },
+              "note": "",
+              "patch": {
+                "kelvin": 6000
+              }
+            },
+            {
+              "id": "cream",
+              "label": {
+                "ko": "크림",
+                "en": "Cream"
+              },
+              "note": "따뜻하고 부드럽게",
+              "patch": {
+                "kelvin": 4500
+              }
+            }
+          ]
         },
-        "airier": {
-          "exposure": 0.4,
-          "note": "더 밝고 가볍게"
+        {
+          "id": "brightness",
+          "ask": {
+            "ko": "밝기는?",
+            "en": "Brightness?"
+          },
+          "default": "normal",
+          "choices": [
+            {
+              "id": "normal",
+              "label": {
+                "ko": "기본",
+                "en": "Normal"
+              },
+              "note": "",
+              "patch": {}
+            },
+            {
+              "id": "airy",
+              "label": {
+                "ko": "더 밝고 가볍게",
+                "en": "Airy"
+              },
+              "note": "",
+              "patch": {
+                "exposure": 0.4
+              }
+            }
+          ]
         }
-      }
+      ]
     },
     {
       "id": "glossy_tech_hero",
@@ -309,16 +453,74 @@
         "면마다 하이라이트가 여러 개 흩어짐",
         "그림자를 완전히 지운 납작한 조명"
       ],
-      "variations": {
-        "darker": {
-          "world_strength": 0.02,
-          "note": "어두운 무대 위 제품"
+      "options": [
+        {
+          "id": "stage",
+          "ask": {
+            "ko": "배경은?",
+            "en": "Background?"
+          },
+          "default": "dark",
+          "choices": [
+            {
+              "id": "dark",
+              "label": {
+                "ko": "어두운 무대",
+                "en": "Dark stage"
+              },
+              "note": "",
+              "patch": {
+                "backdrop": "dark_gradient",
+                "world_strength": 0.04
+              }
+            },
+            {
+              "id": "light",
+              "label": {
+                "ko": "밝은 카탈로그",
+                "en": "Light catalog"
+              },
+              "note": "",
+              "patch": {
+                "backdrop": "light_gradient",
+                "world_strength": 0.3
+              }
+            }
+          ]
         },
-        "lighter": {
-          "backdrop": "light_gradient",
-          "note": "밝은 카탈로그 톤"
+        {
+          "id": "floor",
+          "ask": {
+            "ko": "바닥은 어떻게 할까?",
+            "en": "Floor?"
+          },
+          "default": "matte",
+          "choices": [
+            {
+              "id": "matte",
+              "label": {
+                "ko": "무광 검정",
+                "en": "Matte black"
+              },
+              "note": "반사 없이 피사체만 떠 있다",
+              "patch": {
+                "backdrop": "black"
+              }
+            },
+            {
+              "id": "acrylic",
+              "label": {
+                "ko": "검정 아크릴",
+                "en": "Black acrylic"
+              },
+              "note": "바닥에 거울처럼 비친다 (광고 느낌)",
+              "patch": {
+                "backdrop": "black_glossy"
+              }
+            }
+          ]
         }
-      }
+      ]
     },
     {
       "id": "jewelry_sparkle",
@@ -410,16 +612,73 @@
         "작은 라이트만 써서 금속이 검게 죽음",
         "반사 안에 지저분한 주변 환경이 비침"
       ],
-      "variations": {
-        "warmer": {
-          "kelvin": 3400,
-          "note": "골드를 더 따뜻하게"
+      "options": [
+        {
+          "id": "tone",
+          "ask": {
+            "ko": "금속 톤은?",
+            "en": "Metal tone?"
+          },
+          "default": "neutral",
+          "choices": [
+            {
+              "id": "neutral",
+              "label": {
+                "ko": "중립 (실버)",
+                "en": "Neutral"
+              },
+              "note": "",
+              "patch": {
+                "kelvin": 5600
+              }
+            },
+            {
+              "id": "warm",
+              "label": {
+                "ko": "따뜻하게 (골드)",
+                "en": "Warm"
+              },
+              "note": "",
+              "patch": {
+                "kelvin": 3400
+              }
+            }
+          ]
         },
-        "brighter_bg": {
-          "backdrop": "light_gradient",
-          "note": "밝은 배경 카탈로그용"
+        {
+          "id": "floor",
+          "ask": {
+            "ko": "바닥은 어떻게 할까?",
+            "en": "Floor?"
+          },
+          "default": "matte",
+          "choices": [
+            {
+              "id": "matte",
+              "label": {
+                "ko": "무광 검정",
+                "en": "Matte black"
+              },
+              "note": "반사 없이 피사체만 떠 있다",
+              "patch": {
+                "backdrop": "black"
+              }
+            },
+            {
+              "id": "acrylic",
+              "label": {
+                "ko": "검정 아크릴",
+                "en": "Black acrylic"
+              },
+              "note": "바닥에 거울처럼 비친다 (광고 느낌)",
+              "patch": {
+                "backdrop": "black_glossy"
+              }
+            }
+          ]
         }
-      }
+      ]
     }
-  ]
+  ],
+  "_options": "Each recipe lists option groups the AI must offer the user as a multiple-choice question (or numbered list). A choice's patch uses only the keys in catalog/apply.py."
 }
