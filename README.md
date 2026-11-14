@@ -27,10 +27,6 @@ npm run dev
 4. **하이라이트 찍기 + 고품질 렌더**: 모델에서 빛이 닿을 곳을 클릭하면 라이트 배치, 패스트레이싱 렌더
 5. **Blender로 내보내기**: 잡은 조명을 그대로 Blender에서 재현
 
-## 조명 문법
-
-[`docs/lighting-grammar.md`](docs/lighting-grammar.md): AI가 "고급스러운 향수 광고" 같은 말을 조명으로 바꿀 때 쓰는 규칙집이에요. 규칙마다 무료로 볼 수 있는 논문 출처와 근거 수준(실험 / 실무 관습 / 그래픽스 지표 / 우리 해석)을 붙였어요.
-
 ## Blender 스킬
 
 [`blender/`](blender/) 폴더에는 같은 34개 프리셋을 Blender에서 만드는 Claude 스킬과 Python 헬퍼가 있습니다. 좌표계가 같아서, 웹에서 잡은 조명을 나중에 Blender로 가져갈 때 그대로 씁니다 (로드맵 5단계). 사용법은 [blender/README.md](blender/README.md) 참고.
