@@ -66,12 +66,15 @@ def render(rid, model, out, RES=480, SAMPLES=128, extra=None):
     alb = BACKDROP.get(bd, 0.05)
     S = size * 6
     me = bpy.data.meshes.new("Sweep")
-    prof = [(-S, 0)] + [(S * 0.3 * math.sin(t / 12 * math.pi / 2), S * 0.3 * (1 - math.cos(t / 12 * math.pi / 2))) for t in range(13)] + [(S * 0.3, S)]
+    N_CURVE = 48  # dense + smooth: a faceted curve shows as stripes in glossy backdrops
+    prof = [(-S, 0)] + [(S * 0.3 * math.sin(t / N_CURVE * math.pi / 2), S * 0.3 * (1 - math.cos(t / N_CURVE * math.pi / 2))) for t in range(N_CURVE + 1)] + [(S * 0.3, S)]
     verts, faces = [], []
     for i, (y, z) in enumerate(prof):
         verts += [(-S, y + size * 1.2, z + lo.z), (S, y + size * 1.2, z + lo.z)]
         if i: faces.append((2 * i - 2, 2 * i - 1, 2 * i + 1, 2 * i))
     me.from_pydata(verts, [], faces)
+    for poly in me.polygons:
+        poly.use_smooth = True
     sweep = bpy.data.objects.new("LT_Sweep", me)
     bpy.context.scene.collection.objects.link(sweep)
     m = bpy.data.materials.new("Backdrop"); m.use_nodes = True
@@ -137,7 +140,7 @@ def render(rid, model, out, RES=480, SAMPLES=128, extra=None):
         bg_cam = next(n for n in nodes if n.type == 'BACKGROUND')
         tc = nodes.new("ShaderNodeTexCoord"); sep = nodes.new("ShaderNodeSeparateXYZ")
         mr = nodes.new("ShaderNodeMapRange")
-        mr.inputs["From Min"].default_value = -0.1; mr.inputs["From Max"].default_value = 0.9
+        mr.inputs["From Min"].default_value = 0.25; mr.inputs["From Max"].default_value = 1.0  # dark near the horizon so glossy floors stay clean
         bg_ref = nodes.new("ShaderNodeBackground")
         bg_ref.inputs["Strength"].default_value = env.get("strength", 0.6)
         lp = nodes.new("ShaderNodeLightPath"); mix = nodes.new("ShaderNodeMixShader")
