@@ -118,7 +118,7 @@ def _clear_distance(ctx, direction, d, name):
 
 
 def lt_light(ctx, name, kind="AREA", az=45, el=30, dist=1.5, ratio=1.0, kelvin=5600,
-             size=0.5, color=None, spot_deg=40, blend=0.15, aim=None, base=3 * math.pi):
+             size=0.5, color=None, spot_deg=40, blend=0.15, aim=None, base=3 * math.pi, spread=None):
     """Add one light. Returns the light object.
 
     ratio=1 gives the same irradiance on the subject as a SUN of strength 3 (calibrated in Cycles).
@@ -142,6 +142,8 @@ def lt_light(ctx, name, kind="AREA", az=45, el=30, dist=1.5, ratio=1.0, kelvin=5
                 data.size, data.size_y = size[0] * s, size[1] * s
             else:
                 data.size = size * s
+            if spread is not None:  # degrees; narrower = less spill (e.g. onto the floor)
+                data.spread = math.radians(spread)
         else:
             data.shadow_soft_size = size * s
         if kind == 'SPOT':
