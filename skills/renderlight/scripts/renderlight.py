@@ -499,7 +499,7 @@ def _render_to(path, res, samples, grade=None):
     try:
         if res:
             ax, ay = scn.render.resolution_x, scn.render.resolution_y
-            k = res / max(ax, ay)
+            k = res / min(ax, ay)  # res = the short side, so wide frames don't shrink the product
             scn.render.resolution_x, scn.render.resolution_y = max(1, round(ax * k)), max(1, round(ay * k))
         scn.render.resolution_percentage = 100
         scn.cycles.samples = samples
@@ -539,6 +539,8 @@ def rl_preview_choices(recipe_id, group, out_dir, base=None, res=320, samples=16
     st = _state() or {}
     kw = {k: st[k] for k in ("subject", "backdrop", "isolate", "keep_lights") if k in st}
     kw.update(apply_kw)
+    if base is None:  # keep the answers already given (angle, tone, ...)
+        base = dict(st.get("options") or {}) if st.get("recipe") == recipe_id else {}
     tiles = []
     for i, c in enumerate(g["choices"]):
         opts = {**(base or {}), group: c["id"]}
@@ -607,3 +609,55 @@ def rl_stats(path):
     lum = (px.reshape(h, w, 4)[::-1, :, :3] @ np.array([0.2126, 0.7152, 0.0722], np.float32)) * 255
     return {"top_band_mean": round(float(lum[: h // 8].mean()), 1), "mean": round(float(lum.mean()), 1),
             "clipped_pct": round(float((lum >= 250).mean() * 100), 2), "crushed_pct": round(float((lum <= 3).mean() * 100), 2)}
+
+
+# ---------------------------------------------------------------- showing previews inside Blender
+def _load_px(path):
+    import numpy as np
+    img = bpy.data.images.load(path, check_existing=False)
+    w, h = img.size
+    px = np.empty(w * h * 4, np.float32)
+    img.pixels.foreach_get(px)
+    bpy.data.images.remove(img)
+    return px.reshape(h, w, 4)
+
+
+def rl_sheet(files, out, gap=6):
+    """Put preview tiles side by side (tile 1 on the left) into one PNG. Numbering is left to right."""
+    import numpy as np
+    tiles = [_load_px(f) for f in files]
+    h = max(t.shape[0] for t in tiles)
+    w = sum(t.shape[1] for t in tiles) + gap * (len(tiles) - 1)
+    sheet = np.zeros((h, w, 4), np.float32)
+    sheet[..., :3], sheet[..., 3] = 0.15, 1.0
+    x = 0
+    for t in tiles:
+        sheet[h - t.shape[0]:, x:x + t.shape[1]] = t  # Blender pixel rows start at the bottom
+        x += t.shape[1] + gap
+    img = bpy.data.images.new(PREFIX + "sheet", w, h, alpha=True)
+    img.pixels.foreach_set(sheet.ravel())
+    img.filepath_raw, img.file_format = out, 'PNG'
+    img.save()
+    bpy.data.images.remove(img)
+    return out
+
+
+def rl_show(path):
+    """Open a preview in an Image Editor inside Blender (if the window has one), so the user sees it at once."""
+    name = PREFIX + "Preview"
+    old = bpy.data.images.get(name)
+    if old:
+        old.filepath = path
+        old.reload()
+        img = old
+    else:
+        img = bpy.data.images.load(path)
+        img.name = name
+    shown = False
+    for win in bpy.context.window_manager.windows:
+        for area in win.screen.areas:
+            if area.type == 'IMAGE_EDITOR':
+                area.spaces.active.image = img
+                area.tag_redraw()
+                shown = True
+    return shown
