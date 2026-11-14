@@ -341,8 +341,8 @@
               "note": "병 밑에 그림자가 퍼진다. 배경이 약간 고르지 않게 된다",
               "patch": {
                 "ratio_scale": {
-                  "bg_left": 0.47,
-                  "bg_right": 0.47
+                  "bg_left": 0.4,
+                  "bg_right": 0.4
                 },
                 "add_lights": [
                   {
